@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Concept Insert Help Page</title>
+</head>
+<body style="font-family: monospace;">
+  <h1>Concept Conversion</h1>
+  <span>Example of how insert statement is formatted from Athena site:</span>
+  <img style="border: 3px solid black; width: 98%; margin: 1rem 0;" src="./conceptinsertexample.png" />
+
+  <b>Paste Line Here:</b>
+  <div style="margin-top: 1rem;">
+    <form id="statementPaste" onsubmit="formatInsertStatement(); return false">
+      <textarea style="margin-left: 1rem; width: 95%; color: grey;" type="text" placeholder="Paste entire line from Athena here"></textarea>
+    </form>
+    <br/>
+  </div>
+
+  <b>Paste Downloaded CSV Here:</b>
+  <span style="color: black; border-radius: .2rem; padding: .2rem; background: yellow; border: 1px solid darkkhaki;">Feature coming soon!</span>
+  <div style="margin-top: 1rem;">
+    <form id="statementPaste" onsubmit="formatInsertStatement(); return false">
+      <textarea disabled style="margin-left: 1rem; width: 95%; color: grey; cursor: not-allowed;" type="text" placeholder="Paste entire line from Athena here"></textarea>
+    </form>
+    <br/>
+  </div>
+
+  <b>Copy Result Here:</b>
+  <div style="margin: 1rem;">
+    <textarea readonly style="width: 98%; color: grey;" type="text" id="result">Insert statement generates here</textarea> 
+  </div>
+
+  <div style="margin: 1rem;">
+    <button onclick="copyResult(); return false" "button">Copy</button>
+    <span style="font-family: cursive;" id="copyNotify">:l waiting...</span>
+</body>
+
+<script>
+  document.getElementById('statementPaste').onkeydown = function(e){
+   if(e.keyCode == 13){
+     formatInsertStatement(e);
+   }
+};
+
+  function formatInsertStatement(e) {
+    const textArr = e.target.value.split("	");
+    const conceptId = parseInt(textArr[0]); const conceptCode = textArr[1]; const conceptName = textArr[2];
+    const conceptClassId = textArr[3]; const domainId = textArr[6]; const vocabularyId = textArr[7];
+
+    const statement = `INSERT INTO public.concept (concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code, valid_start_date, valid_end_date, invalid_reason) VALUES (${conceptId}, '${conceptName}', '${domainId}', '${vocabularyId}', '${conceptClassId}', 'S', '${conceptCode}', '1970-01-01', '2099-12-31', NULL);`
+    const resultEl = document.getElementById('result');
+    resultEl.value = statement;
+    
+    const copyNotifyEl = document.getElementById('copyNotify');
+    copyNotifyEl.innerHTML = ":0 generated statement~";
+  }
+
+  function copyResult(e) {
+    const resultEl = document.getElementById('result');
+    const copyNotifyEl = document.getElementById('copyNotify');
+    document.getElementById('result').select();
+    document.execCommand('copy');
+    copyNotifyEl.innerHTML = ":D COPIED!!1";
+    clearInputs();
+  }
+
+  function clearInputs(e) {
+    const conceptId = document.getElementById('concept_id');
+    const conceptCode = document.getElementById('concept_code');
+    const conceptName = document.getElementById('concept_name');
+    const conceptClassId = document.getElementById('concept_class_id');
+    const standardConcept = document.getElementById('standard_concept');
+    const domainId = document.getElementById('domain_id');
+    const vocabularyId = document.getElementById('vocabulary_id');
+    const copyNotifyEl = document.getElementById('copyNotify');
+
+    conceptId.value = '';
+    conceptCode.value = '';
+    conceptName.value = '';
+    conceptClassId.value = '';
+    standardConcept.value = '';
+    domainId.value = '';
+    vocabularyId.value = '';
+    copyNotifyEl.value = ''
+
+    copyNotifyEl.innerHTML = ":V !!...";
+    setTimeout(function(){copyNotifyEl.innerHTML = ":l waiting for another one..."}, 1000);
+  }
+</script>
+</html>
