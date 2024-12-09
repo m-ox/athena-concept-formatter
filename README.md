@@ -1,5 +1,7 @@
 # Simple GUI Concept Converter
 
-Are you needing SQL insert statements for your import.sql in your Java project?
+Are you flush with CSV files filled with hundreds of LOINC and OMOP extension codes and having to manually convert them to SQL insert statements for your Springboot project and have a deadline?
 
-This will do that for you!
+Suffer no longer! This will do that for you!
+
+Simply copy the contents of a CSV file downloaded from https://athena.ohdsi.org/ or copy the text right out of your search results on the website raw. Paste it into the text area, boom. Insert statements.
