@@ -8,19 +8,10 @@
   <span>Example of how insert statement is formatted from Athena site:</span>
   <img style="border: 3px solid black; width: 98%; margin: 1rem 0;" src="./conceptinsertexample.png" />
 
-  <b>Paste Line Here:</b>
+  <b>Paste CSV (no headers) or direct copy pasted search terms (single or multiple accepted) here:</b>
   <div style="margin-top: 1rem;">
     <form id="statementPaste" onsubmit="formatInsertStatement(); return false">
       <textarea style="margin-left: 1rem; width: 95%; color: grey;" type="text" placeholder="Paste entire line from Athena here"></textarea>
-    </form>
-    <br/>
-  </div>
-
-  <b>Paste Downloaded CSV Here:</b>
-  <span style="color: black; border-radius: .2rem; padding: .2rem; background: yellow; border: 1px solid darkkhaki;">Feature coming soon!</span>
-  <div style="margin-top: 1rem;">
-    <form id="statementPaste" onsubmit="formatInsertStatement(); return false">
-      <textarea disabled style="margin-left: 1rem; width: 95%; color: grey; cursor: not-allowed;" type="text" placeholder="Paste entire line from Athena here"></textarea>
     </form>
     <br/>
   </div>
@@ -43,16 +34,42 @@
 };
 
   function formatInsertStatement(e) {
-    const textArr = e.target.value.split("	");
-    const conceptId = parseInt(textArr[0]); const conceptCode = textArr[1]; const conceptName = textArr[2];
-    const conceptClassId = textArr[3]; const domainId = textArr[6]; const vocabularyId = textArr[7];
+    const eventValue = e.target.value;
+    const lineArr = eventValue.split("\n");
+    if (lineArr.length > 1) {
+      const linesArr = lineArr.map(line => {
+        const textArr = line.split("	");
+        const conceptId = parseInt(textArr[0]); const conceptCode = textArr[1]; const conceptName = textArr[2];
+        const conceptClassId = textArr[3]; const domainId = textArr[6]; const vocabularyId = textArr[7];
+        if (!isNaN(conceptId)) {
+          const statement = `INSERT INTO public.concept (concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code, valid_start_date, valid_end_date, invalid_reason) VALUES (${conceptId}, '${conceptName}', '${domainId}', '${vocabularyId}', '${conceptClassId}', 'S', '${conceptCode}', '1970-01-01', '2099-12-31', NULL);`
+          return statement;
+        } else {
+          return undefined;
+        }
+      });
+      const multiStatement = linesArr.filter(line => line !== undefined).join("\n");
+      const resultEl = document.getElementById('result');
+      resultEl.value = multiStatement;
 
-    const statement = `INSERT INTO public.concept (concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code, valid_start_date, valid_end_date, invalid_reason) VALUES (${conceptId}, '${conceptName}', '${domainId}', '${vocabularyId}', '${conceptClassId}', 'S', '${conceptCode}', '1970-01-01', '2099-12-31', NULL);`
-    const resultEl = document.getElementById('result');
-    resultEl.value = statement;
-    
-    const copyNotifyEl = document.getElementById('copyNotify');
-    copyNotifyEl.innerHTML = ":0 generated statement~";
+      const copyNotifyEl = document.getElementById('copyNotify');
+      copyNotifyEl.innerHTML = ":0 generated MULTI statement~";
+    } else if (lineArr.length == 1) {
+      const textArr = eventValue.split("	");
+      const conceptId = parseInt(textArr[0]); const conceptCode = textArr[1]; const conceptName = textArr[2];
+      const conceptClassId = textArr[3]; const domainId = textArr[6]; const vocabularyId = textArr[7];
+
+      const statement = `INSERT INTO public.concept (concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code, valid_start_date, valid_end_date, invalid_reason) VALUES (${conceptId}, '${conceptName}', '${domainId}', '${vocabularyId}', '${conceptClassId}', 'S', '${conceptCode}', '1970-01-01', '2099-12-31', NULL);`
+      const resultEl = document.getElementById('result');
+      resultEl.value = statement;
+
+      const copyNotifyEl = document.getElementById('copyNotify');
+      copyNotifyEl.innerHTML = ":0 generated statement~";
+    } else {
+      const copyNotifyEl = document.getElementById('copyNotify');
+      copyNotifyEl.innerHTML = ">:l something's wrong";
+      console.error("The following was not valid: { " + eventValue + " }")
+    }
   }
 
   function copyResult(e) {
