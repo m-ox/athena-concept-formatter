@@ -1,4 +1,4 @@
-# Simple GUI Concept Formatter
+# Simple GUI Athena Concept Code Formatter
 
 Are you flush with CSV files filled with hundreds of LOINC and OMOP extension codes and having to manually convert them to SQL insert statements for your Springboot project and have a deadline?
 
